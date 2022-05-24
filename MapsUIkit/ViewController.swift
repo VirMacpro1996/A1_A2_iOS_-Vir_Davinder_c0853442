@@ -18,8 +18,22 @@ class ViewController: UIViewController , CLLocationManagerDelegate{
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(tapped))
+         tap.numberOfTapsRequired = 1
+       // tap.numberOfTouchesRequired = 2
+        view.addGestureRecognizer(tap)
     }
-
+    
+    
+    @objc func tapped(sender: UITapGestureRecognizer)
+    {
+        if sender.state == .ended
+        {
+            print("tap geture recognized")
+        }
+    }
+ 
     override func viewDidAppear(_ animated: Bool)
     {
         super.viewDidAppear(animated)
