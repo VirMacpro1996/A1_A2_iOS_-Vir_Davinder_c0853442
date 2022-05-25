@@ -16,7 +16,6 @@ class ViewController: UIViewController , CLLocationManagerDelegate , MKMapViewDe
     var count = 0
     var arr:[String] = ["A","B","C"]
     
-    let places = Place.getPlaces()
     var destination : CLLocationCoordinate2D!
     var start : CLLocationCoordinate2D!
     
@@ -93,22 +92,21 @@ class ViewController: UIViewController , CLLocationManagerDelegate , MKMapViewDe
         
     }
     func addPolygon() {
-            let coordinates = places.map {$0.coordinate}
-            let polygon = MKPolygon(coordinates: coordinates, count: coordinates.count)
+            let polygon = MKPolygon(coordinates: coodarr, count: coodarr.count)
             mapView.addOverlay(polygon)
         }
     
-    func addAnnotationsForPlaces() {
-            mapView.addAnnotations(places)
-            
-            let overlays = places.map {MKCircle(center: $0.coordinate, radius: 2000)}
-            mapView.addOverlays(overlays)
-        }
-    func addPolyline() {
-            let coordinates = places.map {$0.coordinate}
-            let polyline = MKPolyline(coordinates: coordinates, count: coordinates.count)
-            mapView.addOverlay(polyline)
-        }
+//    func addAnnotationsForPlaces() {
+//            mapView.addAnnotations(places)
+//
+//            let overlays = places.map {MKCircle(center: $0.coordinate, radius: 2000)}
+//            mapView.addOverlays(overlays)
+//        }
+//    func addPolyline() {
+//            let coordinates = places.map {$0.coordinate}
+//            let polyline = MKPolyline(coordinates: coordinates, count: coordinates.count)
+//            mapView.addOverlay(polyline)
+//        }
     
     func removePin() {
             for annotation in mapView.annotations
@@ -208,6 +206,10 @@ class ViewController: UIViewController , CLLocationManagerDelegate , MKMapViewDe
             
             annotation.coordinate = coordinate
             mapView.addAnnotation(annotation)
+            if coodarr.count == 3
+            {
+                addPolygon()
+            }
         }
             else
             {
@@ -278,9 +280,9 @@ class ViewController: UIViewController , CLLocationManagerDelegate , MKMapViewDe
                 return rendrer
             } else if overlay is MKPolygon {
                 let rendrer = MKPolygonRenderer(overlay: overlay)
-                rendrer.fillColor = UIColor.red.withAlphaComponent(0.6)
-                rendrer.strokeColor = UIColor.yellow
-                rendrer.lineWidth = 2
+                rendrer.fillColor = UIColor.red.withAlphaComponent(0.5)
+                rendrer.strokeColor = UIColor.green
+                rendrer.lineWidth = 4
                 return rendrer
             }
             return MKOverlayRenderer()
