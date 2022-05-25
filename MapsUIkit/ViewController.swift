@@ -13,6 +13,7 @@ class ViewController: UIViewController , CLLocationManagerDelegate{
     
     @IBOutlet var mapView: MKMapView!
     
+    var count = 0
     
     let manager = CLLocationManager()
     override func viewDidLoad() {
@@ -23,6 +24,10 @@ class ViewController: UIViewController , CLLocationManagerDelegate{
          tap.numberOfTapsRequired = 1
        // tap.numberOfTouchesRequired = 2
         view.addGestureRecognizer(tap)
+        
+        
+        
+        
     }
     
     
@@ -30,10 +35,47 @@ class ViewController: UIViewController , CLLocationManagerDelegate{
     {
         if sender.state == .ended
         {
+        if count < 3
+            {
+            let touchPoint = sender.location(in: mapView)
+            let coordinate = mapView.convert(touchPoint, toCoordinateFrom: mapView)
+                    let annotation = MKPointAnnotation()
+            if count == 0
+            {
+                    annotation.title = "A"
+                    count += 1
+            }
+            else if count == 1
+            {
+                    annotation.title = "B"
+                    count += 1
+            }
+            else if count == 2
+            {
+                annotation.title = "C"
+                count += 1
+
+            }
+            
+            annotation.coordinate = coordinate
+            mapView.addAnnotation(annotation)
+        }
+            else
+            {
+                
+            }
+           
+                    
+                  //  destination = coordinate
+                   // directionBtn.isHidden = false
+            
             print("tap geture recognized")
         }
     }
  
+    
+    
+    
     override func viewDidAppear(_ animated: Bool)
     {
         super.viewDidAppear(animated)
