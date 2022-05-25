@@ -15,6 +15,7 @@ class ViewController: UIViewController , CLLocationManagerDelegate , MKMapViewDe
     
     var count = 0
     var arr:[String] = ["A","B","C"]
+    var mylocation : CLLocation? = nil
     
     var destination : CLLocationCoordinate2D!
     var start : CLLocationCoordinate2D!
@@ -47,8 +48,9 @@ class ViewController: UIViewController , CLLocationManagerDelegate , MKMapViewDe
     
     @IBAction func draw(_ sender: UIButton) {
         
+        mapView.removeOverlays(mapView.overlays)
         
-        routes(start : coodarr[0],destination : coodarr[0])
+        routes(start : coodarr[0],destination : coodarr[1])
         routes(start :coodarr[1],destination : coodarr[2])
         routes(start :coodarr[2],destination : coodarr[0])
         
@@ -58,7 +60,7 @@ class ViewController: UIViewController , CLLocationManagerDelegate , MKMapViewDe
     func routes(start : CLLocationCoordinate2D , destination : CLLocationCoordinate2D)
     {
         
-        mapView.removeOverlays(mapView.overlays)
+       
                
                let sourcePlaceMark = MKPlacemark(coordinate: start)
                let destinationPlaceMark = MKPlacemark(coordinate: destination)
@@ -123,12 +125,12 @@ class ViewController: UIViewController , CLLocationManagerDelegate , MKMapViewDe
    
         }
     
-    func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
-            let alertController = UIAlertController(title: "Your Favorite", message: "A nice place to visit", preferredStyle: .alert)
-            let cancelAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
-            alertController.addAction(cancelAction)
-            present(alertController, animated: true, completion: nil)
-        }
+//    func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
+//            let alertController = UIAlertController(title: "Your Favorite", message: "A nice place to visit", preferredStyle: .alert)
+//            let cancelAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+//            alertController.addAction(cancelAction)
+//            present(alertController, animated: true, completion: nil)
+//        }
    
     @objc func addLongPressAnnotattion(gestureRecognizer: UIGestureRecognizer) {
         
@@ -144,17 +146,19 @@ class ViewController: UIViewController , CLLocationManagerDelegate , MKMapViewDe
             
             if count == 0
             {
-                
+                coodarr.append(coordinate)
                     annotation.title = arr[count]
                     count += 1
             }
             else if count == 1
             {
+                coodarr.append(coordinate)
                     annotation.title = arr[count]
                     count += 1
             }
             else if count == 2
             {
+                coodarr.append(coordinate)
                 annotation.title = arr[count]
                 count += 1
 
@@ -162,10 +166,16 @@ class ViewController: UIViewController , CLLocationManagerDelegate , MKMapViewDe
             
             annotation.coordinate = coordinate
             mapView.addAnnotation(annotation)
+            
+            if coodarr.count == 3
+            {
+                addPolygon()
+            }
         }
         else
         {
-            
+            removePin()
+            count = 0
         }
     }
     }
@@ -246,9 +256,10 @@ class ViewController: UIViewController , CLLocationManagerDelegate , MKMapViewDe
     }
     func render(_ location : CLLocation)
     {
-        let coordinate = CLLocationCoordinate2D(latitude: 45.728,
-                                                longitude: -67)
+        let coordinate = CLLocationCoordinate2D(latitude : location.coordinate.latitude,
+                                                longitude: location.coordinate.longitude)
         
+        mylocation = location
         let span = MKCoordinateSpan(latitudeDelta: 0.1,
                                                      longitudeDelta: 0.1)
         
@@ -259,63 +270,66 @@ class ViewController: UIViewController , CLLocationManagerDelegate , MKMapViewDe
         let pin = MKPointAnnotation()
         pin.coordinate = coordinate
         pin.title = "Vir Here"
-        pin.subtitle = "empty"
+        pin.subtitle = "My Location"
         mapView.addAnnotation(pin)
         
         
         
     }
     
+    @objc func getDistance(pointer1: CLLocation, pointer2: CLLocation) ->String {
+            let distanceInMeters = pointer1.distance(from: pointer2);
+            let distanceInKms = distanceInMeters / 1000;
+            return String(format: "%.2f", distanceInKms)
+        }
+    
+    func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
+            let distanceFromA = getDistance(pointer1: mylocation!, pointer2: CLLocation(latitude: coodarr[0].latitude, longitude: coodarr[0].longitude))
+            let distanceFromB = getDistance(pointer1: mylocation!, pointer2: CLLocation(latitude: coodarr[1].latitude, longitude: coodarr[1].longitude))
+            let distanceFromC = getDistance(pointer1: mylocation!, pointer2: CLLocation(latitude: coodarr[2].latitude, longitude: coodarr[2].longitude))
+
+            let alertController = UIAlertController(title: "Distance", message: "From Point A : \(distanceFromA) KM\n From Point B : \(distanceFromB) KM\n From Point C : \(distanceFromC) KM", preferredStyle: .alert)
+            let cancelAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+            alertController.addAction(cancelAction)
+            present(alertController, animated: true, completion: nil)
+        }
+    
+    
+   
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
-            if overlay is MKCircle {
-                let rendrer = MKCircleRenderer(overlay: overlay)
-                rendrer.fillColor = UIColor.black.withAlphaComponent(0.5)
-                rendrer.strokeColor = UIColor.green
-                rendrer.lineWidth = 2
-                return rendrer
-            } else if overlay is MKPolyline {
-                let rendrer = MKPolylineRenderer(overlay: overlay)
-                rendrer.strokeColor = UIColor.blue
-                rendrer.lineWidth = 3
-                return rendrer
-            } else if overlay is MKPolygon {
+           
+        if overlay is MKPolyline {
+                    let rendrer = MKPolylineRenderer(overlay: overlay)
+                    rendrer.strokeColor = UIColor.blue
+                    rendrer.lineWidth = 3
+                    return rendrer
+                }
+        else if overlay is MKPolygon {
                 let rendrer = MKPolygonRenderer(overlay: overlay)
                 rendrer.fillColor = UIColor.red.withAlphaComponent(0.5)
                 rendrer.strokeColor = UIColor.green
                 rendrer.lineWidth = 4
                 return rendrer
-            }
-            return MKOverlayRenderer()
+                }
+        return MKOverlayRenderer()
+            
         }
     func mapView(_ mapView: MKMapView , viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         
-        guard !(annotation is MKUserLocation) else
-        {
-            return nil
-        }
-        
-        var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: "custom")
-        
-        
-        if annotation == nil
-        {
-            
-            annotationView = MKAnnotationView(annotation: annotation, reuseIdentifier: "custom")
-
-            annotationView?.canShowCallout  = true
-        }
-        else
-        {
-            annotationView?.annotation = annotation
-        }
-        
-        annotationView?.image = UIImage(named: "location-arrow")
-        return annotationView
+        if annotation is MKUserLocation {
+                   return nil
+               }
+               let annotationView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: "droppablePin")
+               annotationView.markerTintColor = #colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1)
+               annotationView.canShowCallout = true
+               annotationView.rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
+               return annotationView
+           }
     }
     
     
     
    
-}
+
 
 
