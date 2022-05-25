@@ -20,6 +20,8 @@ class ViewController: UIViewController , CLLocationManagerDelegate , MKMapViewDe
     var destination : CLLocationCoordinate2D!
     var start : CLLocationCoordinate2D!
     
+    var coodarr: [CLLocationCoordinate2D] = []
+    
     let manager = CLLocationManager()
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -163,6 +165,8 @@ class ViewController: UIViewController , CLLocationManagerDelegate , MKMapViewDe
    
     @objc func tapped(sender: UITapGestureRecognizer)
     {
+        
+        mapView.removeOverlays(mapView.overlays)
         if sender.state == .ended
         {
         if count < 3
@@ -173,7 +177,7 @@ class ViewController: UIViewController , CLLocationManagerDelegate , MKMapViewDe
                     let annotation = MKPointAnnotation()
             if count == 0
             {
-                start = coordinate
+               start = coordinate
                     annotation.title = arr[count]
                     count += 1
             }
@@ -185,6 +189,8 @@ class ViewController: UIViewController , CLLocationManagerDelegate , MKMapViewDe
             }
             else if count == 2
             {
+                
+                
                 annotation.title = arr[count]
                 count += 1
 
