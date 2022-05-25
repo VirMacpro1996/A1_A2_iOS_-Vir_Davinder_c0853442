@@ -17,6 +17,8 @@ class ViewController: UIViewController , CLLocationManagerDelegate , MKMapViewDe
     var arr:[String] = ["A","B","C"]
     
     let places = Place.getPlaces()
+    var destination : CLLocationCoordinate2D!
+    var start : CLLocationCoordinate2D!
     
     let manager = CLLocationManager()
     override func viewDidLoad() {
@@ -42,6 +44,42 @@ class ViewController: UIViewController , CLLocationManagerDelegate , MKMapViewDe
         
     }
     
+    @IBAction func draw(_ sender: UIButton) {
+        
+        
+        
+        mapView.removeOverlays(mapView.overlays)
+               
+               let sourcePlaceMark = MKPlacemark(coordinate: start)
+               let destinationPlaceMark = MKPlacemark(coordinate: destination)
+               
+               // request a direction
+               let directionRequest = MKDirections.Request()
+               
+               // assign the source and destination properties of the request
+               directionRequest.source = MKMapItem(placemark: sourcePlaceMark)
+               directionRequest.destination = MKMapItem(placemark: destinationPlaceMark)
+               
+               // transportation type
+               directionRequest.transportType = .automobile
+               
+               // calculate the direction
+               let directions = MKDirections(request: directionRequest)
+               directions.calculate { (response, error) in
+                   guard let directionResponse = response else {return}
+                   // create the route
+                   let route = directionResponse.routes[0]
+                   // drawing a polyline
+                   self.mapView.addOverlay(route.polyline, level: .aboveRoads)
+                   
+                   // define the bounding map rect
+                   let rect = route.polyline.boundingMapRect
+                   self.mapView.setVisibleMapRect(rect, edgePadding: UIEdgeInsets(top: 100, left: 100, bottom: 100, right: 100), animated: true)
+                   
+       //            self.map.setRegion(MKCoordinateRegion(rect), animated: true)
+               
+           }
+    }
     func addPolygon() {
             let coordinates = places.map {$0.coordinate}
             let polygon = MKPolygon(coordinates: coordinates, count: coordinates.count)
@@ -61,11 +99,18 @@ class ViewController: UIViewController , CLLocationManagerDelegate , MKMapViewDe
         }
     
     func removePin() {
-            for annotation in mapView.annotations {
+            for annotation in mapView.annotations
+           {
+                if annotation.title == "Vir Here"
+                {
+                }
+                else
+                {
                 mapView.removeAnnotation(annotation)
+                }
             }
             
-    //        map.removeAnnotations(map.annotations)
+   
         }
     
     func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
@@ -89,6 +134,7 @@ class ViewController: UIViewController , CLLocationManagerDelegate , MKMapViewDe
             
             if count == 0
             {
+                
                     annotation.title = arr[count]
                     count += 1
             }
@@ -123,14 +169,17 @@ class ViewController: UIViewController , CLLocationManagerDelegate , MKMapViewDe
             {
             let touchPoint = sender.location(in: mapView)
             let coordinate = mapView.convert(touchPoint, toCoordinateFrom: mapView)
+            
                     let annotation = MKPointAnnotation()
             if count == 0
             {
+                start = coordinate
                     annotation.title = arr[count]
                     count += 1
             }
             else if count == 1
             {
+                destination = coordinate
                     annotation.title = arr[count]
                     count += 1
             }
