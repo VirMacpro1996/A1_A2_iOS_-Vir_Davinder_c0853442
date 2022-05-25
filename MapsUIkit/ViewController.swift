@@ -16,6 +16,7 @@ class ViewController: UIViewController , CLLocationManagerDelegate , MKMapViewDe
     var count = 0
     var arr:[String] = ["A","B","C"]
     
+    let places = Place.getPlaces()
     
     let manager = CLLocationManager()
     override func viewDidLoad() {
@@ -30,10 +31,50 @@ class ViewController: UIViewController , CLLocationManagerDelegate , MKMapViewDe
         let longpress = UILongPressGestureRecognizer(target: self, action: #selector(addLongPressAnnotattion))
         view.addGestureRecognizer(longpress)
         
+        manager.delegate = self
+        manager.startUpdatingLocation()
+        
         mapView.delegate = self
+        
+        addPolygon()
+        
+        
         
     }
     
+    func addPolygon() {
+            let coordinates = places.map {$0.coordinate}
+            let polygon = MKPolygon(coordinates: coordinates, count: coordinates.count)
+            mapView.addOverlay(polygon)
+        }
+    
+    func addAnnotationsForPlaces() {
+            mapView.addAnnotations(places)
+            
+            let overlays = places.map {MKCircle(center: $0.coordinate, radius: 2000)}
+            mapView.addOverlays(overlays)
+        }
+    func addPolyline() {
+            let coordinates = places.map {$0.coordinate}
+            let polyline = MKPolyline(coordinates: coordinates, count: coordinates.count)
+            mapView.addOverlay(polyline)
+        }
+    
+    func removePin() {
+            for annotation in mapView.annotations {
+                mapView.removeAnnotation(annotation)
+            }
+            
+    //        map.removeAnnotations(map.annotations)
+        }
+    
+    func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
+            let alertController = UIAlertController(title: "Your Favorite", message: "A nice place to visit", preferredStyle: .alert)
+            let cancelAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+            alertController.addAction(cancelAction)
+            present(alertController, animated: true, completion: nil)
+        }
+   
     @objc func addLongPressAnnotattion(gestureRecognizer: UIGestureRecognizer) {
         
         if gestureRecognizer.state == .ended
@@ -105,7 +146,8 @@ class ViewController: UIViewController , CLLocationManagerDelegate , MKMapViewDe
         }
             else
             {
-                
+                removePin()
+                count = 0
             }
            
             
