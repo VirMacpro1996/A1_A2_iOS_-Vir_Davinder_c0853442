@@ -49,6 +49,15 @@ class ViewController: UIViewController , CLLocationManagerDelegate , MKMapViewDe
     @IBAction func draw(_ sender: UIButton) {
         
         
+        routes(start : coodarr[0],destination : coodarr[0])
+        routes(start :coodarr[1],destination : coodarr[2])
+        routes(start :coodarr[2],destination : coodarr[0])
+        
+       
+    }
+    
+    func routes(start : CLLocationCoordinate2D , destination : CLLocationCoordinate2D)
+    {
         
         mapView.removeOverlays(mapView.overlays)
                
@@ -78,9 +87,10 @@ class ViewController: UIViewController , CLLocationManagerDelegate , MKMapViewDe
                    let rect = route.polyline.boundingMapRect
                    self.mapView.setVisibleMapRect(rect, edgePadding: UIEdgeInsets(top: 100, left: 100, bottom: 100, right: 100), animated: true)
                    
-       //            self.map.setRegion(MKCoordinateRegion(rect), animated: true)
-               
            }
+        
+        
+        
     }
     func addPolygon() {
             let coordinates = places.map {$0.coordinate}
@@ -177,20 +187,20 @@ class ViewController: UIViewController , CLLocationManagerDelegate , MKMapViewDe
                     let annotation = MKPointAnnotation()
             if count == 0
             {
-               start = coordinate
+                coodarr.append(coordinate)
                     annotation.title = arr[count]
                     count += 1
             }
             else if count == 1
             {
-                destination = coordinate
+                coodarr.append(coordinate)
                     annotation.title = arr[count]
                     count += 1
             }
             else if count == 2
             {
                 
-                
+                coodarr.append(coordinate)
                 annotation.title = arr[count]
                 count += 1
 
