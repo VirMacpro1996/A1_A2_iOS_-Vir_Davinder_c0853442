@@ -98,17 +98,7 @@ class ViewController: UIViewController , CLLocationManagerDelegate , MKMapViewDe
             mapView.addOverlay(polygon)
         }
     
-//    func addAnnotationsForPlaces() {
-//            mapView.addAnnotations(places)
-//
-//            let overlays = places.map {MKCircle(center: $0.coordinate, radius: 2000)}
-//            mapView.addOverlays(overlays)
-//        }
-//    func addPolyline() {
-//            let coordinates = places.map {$0.coordinate}
-//            let polyline = MKPolyline(coordinates: coordinates, count: coordinates.count)
-//            mapView.addOverlay(polyline)
-//        }
+
     
     func removePin() {
             for annotation in mapView.annotations
@@ -125,12 +115,8 @@ class ViewController: UIViewController , CLLocationManagerDelegate , MKMapViewDe
    
         }
     
-//    func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
-//            let alertController = UIAlertController(title: "Your Favorite", message: "A nice place to visit", preferredStyle: .alert)
-//            let cancelAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
-//            alertController.addAction(cancelAction)
-//            present(alertController, animated: true, completion: nil)
-//        }
+
+
    
     @objc func addLongPressAnnotattion(gestureRecognizer: UIGestureRecognizer) {
         
@@ -170,6 +156,7 @@ class ViewController: UIViewController , CLLocationManagerDelegate , MKMapViewDe
             if coodarr.count == 3
             {
                 addPolygon()
+                count = 0
             }
         }
         else
@@ -219,10 +206,12 @@ class ViewController: UIViewController , CLLocationManagerDelegate , MKMapViewDe
             if coodarr.count == 3
             {
                 addPolygon()
+                
             }
         }
             else
             {
+                coodarr.removeAll()
                 removePin()
                 count = 0
             }
